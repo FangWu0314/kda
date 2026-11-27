@@ -26,8 +26,8 @@ Have a kernel that needs optimization? [Submit a request](https://github.com/NVl
 Install the agent workflow dependencies before starting the agent session:
 
 ```bash
-git clone --recurse-submodules https://github.com/mit-han-lab/kernel-design-agents.git
-cd kernel-design-agents
+git clone --recurse-submodules --remote-submodules https://github.com/FangWu0314/kda.git
+cd kda
 
 # link skills
 mkdir -p ~/.claude/skills
@@ -39,18 +39,23 @@ mkdir -p ~/.claude/skills && cd ~/.claude/skills
 git clone https://github.com/mit-han-lab/ncu-report-skill.git
 ```
 
-Use KernelWiki from this repository's pinned submodule. A direct upstream
-checkout may contain artifact snapshots governed by additional terms that are
-omitted from this distribution.
+`--remote-submodules` checks out the latest upstream commit of each submodule
+instead of the revision recorded in this repository. To refresh an existing
+checkout, run `git submodule update --remote`. To fall back to the recorded
+revisions, run `git submodule update`.
+
+The upstream KernelWiki checkout may contain artifact snapshots governed by
+additional terms, such as the NVIDIA CuTe DSL license. Review those terms before
+redistributing it.
 
 ## Submodules
 
-The following third-party projects are included as Git submodules. The source URLs and revisions below are intentional and match the gitlinks recorded in this repository.
+The following third-party projects are included as Git submodules. With the clone command above they follow their upstream branches; the gitlinks recorded in this repository are only a fallback.
 
-| Path | Source | Pinned revision | License |
+| Path | Source | Revision | License |
 |---|---|---|---|
-| `skills/KernelWiki` | [mit-han-lab/KernelWiki](https://github.com/mit-han-lab/KernelWiki.git) | Based on [`76d27b56f804e7e7295d4c570e1e5d7eef4b0a75`](https://github.com/mit-han-lab/KernelWiki/commit/76d27b56f804e7e7295d4c570e1e5d7eef4b0a75), with the repository-maintained release sanitization recorded by the gitlink | MIT for original material; embedded artifacts retain their upstream terms; restricted CuTe DSL artifacts are omitted |
-| `skills/ncu-report-skill` | [mit-han-lab/ncu-report-skill](https://github.com/mit-han-lab/ncu-report-skill.git) | [`d1887948c7d53690cfe6605f59c1329b8a1c6bb5`](https://github.com/mit-han-lab/ncu-report-skill/commit/d1887948c7d53690cfe6605f59c1329b8a1c6bb5) | MIT |
+| `skills/KernelWiki` | [mit-han-lab/KernelWiki](https://github.com/mit-han-lab/KernelWiki.git) | Tracks upstream `master` (`branch = master` in `.gitmodules`); fallback gitlink [`b6b4301f15e8ce6955a56776690643ce5db369e6`](https://github.com/mit-han-lab/KernelWiki/commit/b6b4301f15e8ce6955a56776690643ce5db369e6) | MIT for original material; embedded artifacts retain their upstream terms |
+| `skills/ncu-report-skill` | [mit-han-lab/ncu-report-skill](https://github.com/mit-han-lab/ncu-report-skill.git) | Tracks the upstream default branch; fallback gitlink [`d1887948c7d53690cfe6605f59c1329b8a1c6bb5`](https://github.com/mit-han-lab/ncu-report-skill/commit/d1887948c7d53690cfe6605f59c1329b8a1c6bb5) | MIT |
 
 These submodules are not covered by this repository's first-party license. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the applicable license text and additional details.
 
