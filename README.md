@@ -16,13 +16,8 @@ This repository documents an early research prototype and remains under active d
 | `THIRD_PARTY_NOTICES.md` | Third-party component and license disclosures. |
 | `third_party_licenses/` | Verbatim upstream license files for distributed third-party components. |
 
-## Community Kernel Wishlist
-
-Have a kernel that needs optimization? [Submit a request](https://github.com/NVlabs/kda/tree/wishlist#submit) directly as a pull request to `wishlist`, with a reproducible definition, representative workloads, and your best-known baseline implementation. No issue is required. The community wishlist currently supports NVIDIA B200 and B300 GPUs only.
-
-[Browse and upvote requests](https://github.com/NVlabs/kda/pulls?q=is%3Apr%20base%3Awishlist), [discuss an idea](https://github.com/NVlabs/kda/issues/new?title=%5Bwishlist%5D%20) if you need help preparing the files, or visit the [project website](https://nvlabs.github.io/kda/). Keep request details in `requests/<github-username>-<kernel-name>/README.md` and use the [wishlist PR template](.github/PULL_REQUEST_TEMPLATE/wishlist.md) for the short description. Merging records the request, while optimization progress and result links remain on the original pull request. Website source lives on `pages`; the PR template and issue chooser settings are maintained on `main`.
-
 ## Getting Started
+
 Install the agent workflow dependencies before starting the agent session:
 
 ```bash
@@ -33,6 +28,7 @@ cd kda
 mkdir -p ~/.claude/skills
 ln -s "$(pwd)/skills/ncu-report-skill" ~/.claude/skills/ncu-report-skill
 ln -s "$(pwd)/skills/KernelWiki" ~/.claude/skills/KernelWiki
+ln -s "$(pwd)/skills/IKET-skill" ~/.claude/skills/IKET-skill
 
 # or clone the independently licensed ncu skill directly
 mkdir -p ~/.claude/skills && cd ~/.claude/skills
@@ -48,40 +44,10 @@ The upstream KernelWiki checkout may contain artifact snapshots governed by
 additional terms, such as the NVIDIA CuTe DSL license. Review those terms before
 redistributing it.
 
-## Submodules
 
-The following third-party projects are included as Git submodules. With the clone command above they follow their upstream branches; the gitlinks recorded in this repository are only a fallback.
+## What You Need To Do
 
-| Path | Source | Revision | License |
-|---|---|---|---|
-| `skills/KernelWiki` | [mit-han-lab/KernelWiki](https://github.com/mit-han-lab/KernelWiki.git) | Tracks upstream `master` (`branch = master` in `.gitmodules`); fallback gitlink [`b6b4301f15e8ce6955a56776690643ce5db369e6`](https://github.com/mit-han-lab/KernelWiki/commit/b6b4301f15e8ce6955a56776690643ce5db369e6) | MIT for original material; embedded artifacts retain their upstream terms |
-| `skills/ncu-report-skill` | [mit-han-lab/ncu-report-skill](https://github.com/mit-han-lab/ncu-report-skill.git) | Tracks the upstream default branch; fallback gitlink [`d1887948c7d53690cfe6605f59c1329b8a1c6bb5`](https://github.com/mit-han-lab/ncu-report-skill/commit/d1887948c7d53690cfe6605f59c1329b8a1c6bb5) | MIT |
-
-These submodules are not covered by this repository's first-party license. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the applicable license text and additional details.
-
-Install the `humanize` Claude Code plugin from the Claude Code plugin UI:
-
-```text
-/plugin marketplace add PolyArch/humanize
-/plugin install humanize@PolyArch
-```
-
-## Minimal Flow
-
-1. Create a separate implementation workspace for the target task.
-2. Define the task contract: objective, constraints, validation command, and promotion criteria.
-3. Start an agent session in the implementation workspace.
-4. Give the agent `prompts/basic-flow.md`, filled in with the task-specific details.
-5. Ask the agent to write a short plan draft to `docs/draft.md` in the implementation workspace.
-6. Convert the draft into an executable plan, either manually or with a planning tool such as Humanize.
-7. Implement in small iterations, verifying after each meaningful change.
-8. Record candidates, benchmark or evaluation results, profiling evidence, and final promotion decisions.
-
-The workflow is intentionally independent of any single benchmark harness or hardware target. A downstream task can add its own evaluator, datasets, profiling tools, and domain-specific references.
-
-Validated CuTe candidates can be [exported as Hugging Face kernels](docs/huggingface-export.md).
-
-## Recommended Workspace Layout
+### 1. Create the Workspace Layout
 
 Use this repository as reference material, then do implementation work elsewhere:
 
@@ -97,12 +63,28 @@ task-workspace/
   candidates.jsonl
 ```
 
-The exact files can change by domain. The important rule is that the agent records enough context for another engineer to understand what was tried, what passed validation, and why the final candidate was selected.
+### 2. Define the Task Contract
 
-## Contributing
+| Item | What to provide | Example |
+|---|---|---|
+| Objective | One or two sentences on the user-facing goal, naming the kernel and the workload. | "Reduce latency of the FP8 grouped GEMM for MoE shapes on B300." |
+| Correctness requirements | Required behavior, numerical tolerances, and invariants that must hold. | "Output matches the reference within 1e-3 relative error on all listed shapes." |
+| Validation command | One command that proves correctness and exits non-zero on failure. | `python tests/test_fp8.py` |
+| Evaluation command | One command that measures the target metric, if different from validation. | `python bench/run.py --shapes shapes.json` |
+| Promotion criteria | What must be true before a candidate replaces the current best. | "Passes validation and is at least 3% faster on the geometric mean, with no shape more than 1% slower." |
+| Constraints | Allowed languages, libraries, and APIs; files or interfaces that must not change; measurement rules such as warmup count and cache state. | "CUDA C++ only; public Python API unchanged; no new dependencies; 3 warmup calls and 5 measured calls, L2 cold." |
 
-This project accepts outside contributions under the Developer Certificate of Origin process. See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+- These items fill the Task Contract placeholders in `prompts/basic-flow.md`; Constraints goes under "Allowed implementation approaches". The template also asks for a task name and a performance or quality target.
+- The validation command and the promotion criteria are the easiest to leave out and the most important. Without an executable validation command, the agent cannot tell on its own whether a result is correct. Without quantified promotion criteria, it does not know when to stop or which candidate to keep.
 
-## License
 
-Except for the third-party submodules identified above, first-party documentation, prompts, skills-style content, and assets are licensed under the [Creative Commons Attribution 4.0 International License](LICENSE), and first-party source code is licensed under the [Apache License 2.0](LICENSE).
+## Workflow
+
+1. Create a **separate implementation workspace** for the target task.
+2. Define the task contract: objective, constraints, validation command, and promotion criteria.
+3. Start an agent session in the implementation workspace.
+4. Give the agent `prompts/basic-flow.md`, filled in with the task-specific details.
+5. Ask the agent to write a short plan draft to `docs/draft.md` in the implementation workspace.
+6. Convert the draft into an executable plan.
+7. Implement in small iterations, verifying after each meaningful change.
+8. Record candidates, benchmark or evaluation results, profiling evidence, and final promotion decisions.

@@ -1,0 +1,118 @@
+{
+  "schema": "cuda-in-kernel-events/v1",
+  "metadata": {
+    "synthetic": true,
+    "note": "Format demonstration only; NOT GPU measurements"
+  },
+  "dropped_events": 0,
+  "events": [
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 0,
+      "sm": 4,
+      "name": "mma.ready_observed",
+      "kind": "B",
+      "ts_ns": 10000000000000000,
+      "span": 0
+    },
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 0,
+      "sm": 4,
+      "name": "mma.ready_observed",
+      "kind": "B",
+      "ts_ns": 10000000000010000,
+      "span": 1
+    },
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 0,
+      "sm": 4,
+      "name": "chunk.put_issue",
+      "kind": "B",
+      "ts_ns": 10000000000032000,
+      "span": 0
+    },
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 0,
+      "sm": 4,
+      "name": "chunk.put_issue",
+      "kind": "E",
+      "ts_ns": 10000000000038000,
+      "span": 0
+    },
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 1,
+      "sm": 4,
+      "name": "mma.wait",
+      "kind": "B",
+      "ts_ns": 10000000000015000,
+      "span": 0
+    },
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 1,
+      "sm": 4,
+      "name": "mma.wait",
+      "kind": "E",
+      "ts_ns": 10000000000030000,
+      "span": 0
+    },
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 1,
+      "sm": 4,
+      "name": "mma.ready_observed",
+      "kind": "E",
+      "ts_ns": 10000000000030000,
+      "span": 0
+    },
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 1,
+      "sm": 4,
+      "name": "mma.ready_observed",
+      "kind": "E",
+      "ts_ns": 10000000000040000,
+      "span": 1
+    },
+    {
+      "rank": 0,
+      "device": 0,
+      "launch": 0,
+      "cta": 0,
+      "warp": 1,
+      "sm": 4,
+      "name": "kernel.path_exit",
+      "kind": "i",
+      "ts_ns": 10000000000041000,
+      "span": 1
+    }
+  ]
+}
